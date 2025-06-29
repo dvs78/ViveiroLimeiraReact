@@ -86,34 +86,298 @@ Importar dentro do arquivo App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 O que é BrowserRouter: vai gerenciar as rotas. Browser = navegador, Router = roteador
+Agora as páginas são componenetes que serão re-renderizados num mesmo documento, 
+ou se é certo dizer, na mesma página
 
-Alterar o código
-
-import React from "react";
+ESTAVA ASSIM:
 import Header from "./components/Header";
-import Main from "./components/Main";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/HomePage/Home";
 
-const App = () => {
+function App() {
   return (
     <>
-      <BrowserRouter>
-        <Header />
-        <Main />
-      </BrowserRouter>
+      <Header />
+      <Home />
     </>
   );
-};
+}
 
 export default App;
 
-E dentro da pasta src criar a pasta pages
+FICOU ASSIM:
+import Header from "./components/Header";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/HomePage/Home";
+import PurchaseHistory from "./pages/PurchaseHistoryPage/PurchaseHistory";
+import Checkout from "./pages/CheckoutPage/Checkout";
+
+function App() {
+  return (
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/history" element={<PurchaseHistory />} />
+      </Routes>
+    </>
+  );
+}
+
+export default App;
+
+IR NO main.jsx e alterar
+ESTAVA ASSIM:
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+FICOU ASSIM:
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>
+);
 
 
-5 PASSO - IMPORTAR LINK
+6 PASSO - FAZER UM HEADER DINÂMICO
+
+ESTAVA ASSIM:
+import React from "react";
+import logo from "../../src/assets/logo/logo_verde_escuro.png";
+import UserBottons from "./UserBottons";
+
+const Header = () => {
+  return (
+    <header className="header">
+      <a href="/">
+        <img className="header__img" src={logo} alt="Logo da TL" />
+      </a>
+      <UserBottons />
+    </header>
+  );
+};
+
+export default Header;
+
+FICOU ASSIM:
+O useLocation traz todas informações (do objeto) do local ("página") em questão
+import React from "react";
+import logo from "../../src/assets/logo/logo_verde_escuro.png";
+import UserBottons from "./UserBottons";
+import { useLocation } from "react-router-dom";
+
+const Header = () => {
+  const { pathname } = useLocation();
+  const completeHeader = (
+    <header className="header">
+      <a href="/">
+        <img className="header__img--home" src={logo} alt="Logo da TL" />
+      </a>
+      <UserBottons />
+    </header>
+  );
+
+  const simpleHeader = (
+    <header className="header">
+      <a href="/">
+        <img className="header__img--paginas" src={logo} alt="Logo da TL" />
+      </a>
+    </header>
+  );
+  return <>{pathname === "/" ? completeHeader : simpleHeader}</>;
+};
+
+export default Header;
+
+
+7 PASSO - IMPORTAR LINK
+Ele substitui o <a href="/"></a>, âncoras é para caminhar entre páginas
 Usar os Link no lugar das âncoras, é utilizado para caminhar dentro do próprio documento
 import { Link } from "react-router-dom";
-Substitui a <a por Link e href por to
+Substituir as <a href="/"></a> por <Link to="/"></Link>
+
+Alterar o Header.jsx
+import React from "react";
+import logo from "../../src/assets/logo/logo_verde_escuro.png";
+import UserBottons from "./UserBottons";
+import { useLocation, Link } from "react-router-dom";
+
+const Header = () => {
+  const { pathname } = useLocation();
+  const completeHeader = (
+    <header className="header">
+      <Link to="/">
+        <img className="header__img--home" src={logo} alt="Logo da TL" />
+      </Link>
+      <UserBottons />
+    </header>
+  );
+
+  const simpleHeader = (
+    <header className="header">
+      <Link to="/">
+        <img className="header__img--paginas" src={logo} alt="Logo da TL" />
+      </Link>
+    </header>
+  );
+  return <>{pathname === "/" ? completeHeader : simpleHeader}</>;
+};
+
+export default Header;
+
+Alterar o userButton
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping, faUser } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+
+const UserBottons = () => {
+  return (
+    <div className="userBotton-div">
+      <button>
+        <FontAwesomeIcon icon={faCartShopping} />
+        <div id="header__icon--contador">3</div>
+      </button>
+      <Link to="/history">
+        <FontAwesomeIcon icon={faUser} />
+      </Link>
+    </div>
+  );
+};
+
+export default UserBottons;
+
+
+7 PASSO - CRIAR A PASTA CONTEXTS EM SRC 
+Criar um arquivo CartContext.js
+import { createContext } from "react";
+
+export const CartContext = createContext(null);
+
+NO ARQUIVO App.jsx va ficar assim:
+import Header from "./components/Header";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/HomePage/Home";
+import PurchaseHistory from "./pages/PurchaseHistoryPage/PurchaseHistory";
+import Checkout from "./pages/CheckoutPage/Checkout";
+import { CartContext } from "./contexts/CartContext";
+
+function App() {
+  return (
+    <CartContext.Provider>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/history" element={<PurchaseHistory />} />
+      </Routes>
+    </CartContext.Provider>
+  );
+}
+
+export default App;
+
+No arquivo CartOverlay.jsx, vai ficar assim:
+Antes recortar isso:
+const [isCartOpen, setIsCartOpen] = useState(true);
+Colar no App.jsx
+import React, { useContext } from "react";
+import { CartContext } from "../../contexts/CartContext";
+
+const CartOverlay = () => {
+  const cartInfo = useContext(CartContext);
+  return (
+    <div
+      className={`cart__container ${
+        cartInfo.isCartOpen ? "cart__container--open" : "cart__container--close"
+      }`}
+    >
+      <section
+        id="outside-of-cart"
+        className="cart__outside-of-cart"
+        onClick={() => cartInfo.setIsCartOpen(false)}
+      ></section>
+      <section id="cart" className="cart__container-section">
+        <h2>Carrinho</h2>
+      </section>
+    </div>
+  );
+};
+
+export default CartOverlay;
+
+No arquivo App.jsx, vai ficar assim
+import { useState } from "react";
+import Header from "./components/Header";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/HomePage/Home";
+import PurchaseHistory from "./pages/PurchaseHistoryPage/PurchaseHistory";
+import Checkout from "./pages/CheckoutPage/Checkout";
+import { CartContext } from "./contexts/CartContext";
+
+function App() {
+  const [isCartOpen, setIsCartOpen] = useState(true);
+  return (
+    <CartContext.Provider value={{ isCartOpen, setIsCartOpen }}>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/history" element={<PurchaseHistory />} />
+      </Routes>
+    </CartContext.Provider>
+  );
+}
+
+export default App;
+
+
+No arquivo UserBottons.jsx, vai ficar assim
+import React, { useContext } from "react";
+import { CartContext } from "../contexts/CartContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartShopping, faUser } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+
+const UserBottons = () => {
+  const cartInfo = useContext(CartContext);
+  return (
+    <div className="userBotton-div">
+      <Link to={"/checkout"}>
+        <button
+          onClick={() => {
+            cartInfo.setIsCartOpen(true);
+          }}
+        >
+          <FontAwesomeIcon icon={faCartShopping} />
+          <div id="header__icon--contador">3</div>
+        </button>
+      </Link>
+      <Link to="/history">
+        <FontAwesomeIcon icon={faUser} />
+      </Link>
+    </div>
+  );
+};
+
+export default UserBottons;
+
 
 
 6 PASSO - CONSTRUIR A API - APPLICATION PROGRAMING INTERFACE (Interface de programação de aplicações)

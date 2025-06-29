@@ -64,7 +64,12 @@ a:hover {
   z-index: 100;
 }
 
-.header__img {
+.header__img--home {
+  height: 80px;
+  padding: 10px 8px;
+}
+
+.header__img--paginas {
   height: 80px;
   padding: 10px 8px;
 }
