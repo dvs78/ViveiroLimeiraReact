@@ -37,6 +37,7 @@ body {
 button {
   all: unset;
   font-family: "Montserrat", sans-serif;
+  cursor: pointer;
 }
 
 select {
@@ -128,6 +129,7 @@ a:hover {
   padding: 5px;
   gap: 25px;
   font-size: 20px;
+  margin-right: 30px;
 }
 
 #header__icon--contador {
@@ -137,7 +139,7 @@ a:hover {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: 0 7px;
+  padding: 0 5px;
   font-size: 15px;
   background-color: var(--vermelho-claro);
   border-radius: 100%;
